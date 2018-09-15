@@ -3,6 +3,9 @@ Python Package for using Statsbomb IQ dataset
 
 This is a work in progress package to allow Python users to work with Statsbomb IQ's free public datasets. The code so far looks only at a match by match json.
 
+
+after install, run with from ## sb_handler import * ##
+
 ## TO DO SHORT TERM ##
 - pull goal keeper data from json
 - write code for pass maps
