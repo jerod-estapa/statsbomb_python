@@ -13,9 +13,10 @@ after install, run with <b> from sb_handler import * </b>
 - create player location shot maps (using SB's freeze frame, plot where players, GK etc.. are when shot is taken)
 - add expanded event information to dataframe
 
+
 ## TO DO LONG TERM ##
 - combine matches to look at player/team data over longer time period
-
+- clean up for loops with list comprehension
 
 some quick functions to get started:
 
