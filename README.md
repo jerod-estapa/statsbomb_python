@@ -30,3 +30,5 @@ played = players_played(data) #returns all players who entered pitch with mins -
 shots = get_shots(data) # returns a dataframe of shots --> to do: add shot outcomes
 
 shot_map(data,team) # plots a shot map for selected team with size and shade representing xG value --> to do: add further shot information (body part, outcome)
+
+player_pass(df,player_name) # plots passes made by player - names can be found by running df.player.unique() --> to do: seperate successful and unsuccessful passes
