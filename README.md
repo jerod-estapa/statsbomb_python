@@ -20,7 +20,7 @@ after install, run with <b> from sb_handler import * </b>
 
 ## some quick functions to get started: ##
 
-data = open_sb(<FILENAME>) #reads json file
+data = open_sb(INSERT_FILENAME) #reads json file
 
 df = clean_sb(data) #cleans data and puts it into a dataframe - more cols to be added
 
