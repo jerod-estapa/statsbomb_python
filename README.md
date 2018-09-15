@@ -13,3 +13,17 @@ This is a work in progress package to allow Python users to work with Statsbomb 
 ## TO DO LONG TERM ##
 - combine matches to look at player/team data over longer time period
 
+
+some quick functions to get started:
+
+data = open_sb(<FILENAME>) #reads json file
+
+df = clean_sb(data) #cleans data and puts it into a dataframe - more cols to be added
+
+StartingXI = Lineups(data) #returns starting players
+
+played = players_played(data) #returns all players who entered pitch with mins --> to do: add goals for/against 
+
+shots = get_shots(data) # returns a dataframe of shots --> to do: add shot outcomes
+
+shot_map(data,team) # plots a shot map for selected team with size and shade representing xG value --> to do: add further shot information (body part, outcome)
