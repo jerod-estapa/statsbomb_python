@@ -18,7 +18,7 @@ after install, run with <b> from sb_handler import * </b>
 - combine matches to look at player/team data over longer time period
 - clean up for loops with list comprehension
 
-some quick functions to get started:
+## some quick functions to get started: ##
 
 data = open_sb(<FILENAME>) #reads json file
 
