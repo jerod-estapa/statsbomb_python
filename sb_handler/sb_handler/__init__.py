@@ -991,7 +991,7 @@ def get_individual_shot(data,shot_number):
         freeze_frame_data.append(data[ffd-1])
 
     freeze_frame_data
-    print("There were "+str(len(freeze_frame_data))+" shots in this match")
+    print("There were "+str(len(freeze_frame_data)-1)+" shots in this match")
 
 
 
