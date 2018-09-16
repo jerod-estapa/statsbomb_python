@@ -34,6 +34,8 @@ shot_map(data,team) # plots a shot map for selected team with size and shade rep
 
 player_pass(df,player_name,orientation) # plots passes made by player - names can be found by running df.player.unique() - orientation set as either 'vertical' or 'horizontal' --> to do: seperate successful and unsuccessful passes
 
+get_individual_shot(data,number) # plots individual shot freeze frame with positions of other players. number refers to shot number with 1 being first shot of match, 2 being second etc..) -> to do: add GK context, creat Abbreviation dictionary to shorten code
+
 ## NOTES ##
 
 I'm not sure what each unit in SB's x and y coordinates refers to, and I prefer working in metres, so all xy values are converted to plot on a 104 x 68 metre pitch
