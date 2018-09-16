@@ -1,7 +1,7 @@
 
 print("Get help at any time by running sb_help()")
 def sb_help():
-    print("Version 0.1\n\nFUNCTIONS:\ndata = open_sb(<FILENAME>)\ndf = clean_sb(data)\nStartingXI = Lineups(data)\nplayers_played(data) shows players who entered pitch\nshots = get_shots(data) returns a dataframe of shots in match\nshot_map(data,'TEAM') produces viz of team shots. Enter Team name\nplayer_pass(df,'PLAYER') produces viz of player passes. Enter player name\n")
+    print("Version 0.1\n\nFUNCTIONS:\ndata = open_sb(<FILENAME>)\ndf = clean_sb(data)\nStartingXI = Lineups(data)\nplayers_played(data) shows players who entered pitch\nshots = get_shots(data) returns a dataframe of shots in match\nshot_map(data,'TEAM') produces viz of team shots. Enter Team name\nplayer_pass(df,'PLAYER','ORIENTATION') produces viz of player passes. Enter player name. Orientation either 'vertical' or 'horizontal\n")
     print("\n\n for further queries contact Peter McKeever on Twitter @petermckeever")
 def open_sb(file):
         file = file
@@ -594,17 +594,19 @@ def shot_map(data, team):
     plt.show()
     
 
-def player_pass(df,player_name):
+def player_pass(df,player_name,orientation):
     import pandas as pd
     import numpy as np
     import seaborn as sns; sns.set()
     from tqdm import tqdm
     import matplotlib.pyplot as plt
-    
+    import pylab
+    from matplotlib.collections import LineCollection
+    import matplotlib as mpl
 
-
+    orientation = orientation
     p_pass = df[(df['player'] == player_name)&(df['type'] == 'Pass')]
-
+    team = p_pass.team.iloc[0]
     p_pass = p_pass[['player','x','y','end_x','end_y','height']]
 
     p_passg = p_pass[p_pass['height'] == 'Ground Pass']
@@ -617,86 +619,13 @@ def player_pass(df,player_name):
 
     #inc_p_pass = p_pass[p_pass['outcome'] == 'Incomplete']
 
-    #teams = shots.team.unique()
+    teams = df.team.unique()
 
-    #if team == teams[0]:
-    #    opposition = teams[1]
-    #else:
-    #    opposition = teams[0]
+    if team == teams[0]:
+        opposition = teams[1]
+    else:
+        opposition = teams[0]
 
-
-
-
-
-
-    fig,ax2 = plt.subplots(figsize=(9.8,12.4))
-    #ax2 = plt.axes([0, 0, 1.5, 0.5])
-    #fig.figsize(6.8,10.4)
-    ax2.axis('off')
-
-
-
-
-                ### TOP ###
-    vcx1 = [0,0,68,68,0]            # sidelines
-    vcy1 = [0,104,104,0,0]
-
-    vcx2 = [13.84,13.84,54.16,54.16] # outer box
-    vcy2 = [104,87.5,87.5,104]
-
-    vcx3 = [30.34,30.34,37.66,37.66] # goal
-    vcy3 = [104,104.2,104.2,104]
-
-    vcx4 = [24.84,24.84,43.16,43.16] # 6-y box
-    vcy4 = [104,99.5,99.5,104]
-
-    vcx5 = [0,68] # Half-way-line
-    vcy5 = [52,52]
-
-
-                ### BOTTOM ###
-
-    vcx6 = [13.84,13.84,54.16,54.16] # outer box
-    vcy6 = [0,16.5,16.5,0]
-
-    vcx7 = [30.34,30.34,37.66,37.66] # goal
-    vcy7 = [0,-0.2,-0.2,0]
-
-    vcx8 = [24.84,24.84,43.16,43.16] # 6-y box
-    vcy8 = [0,4.5,4.5,0]
-
-
-    #CENTRE CIRCLE
-
-    circle3 = plt.Circle((34, 52), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
-
-
-    ###### BOX #######
-    plt.plot(vcx1,vcy1,c='black',zorder=5)
-    plt.plot(vcx2,vcy2,c='black',zorder=5)
-    plt.plot(vcx3,vcy3,c='black',zorder=5)
-    plt.plot(vcx4,vcy4,c='black',zorder=5)
-    plt.plot(vcx5,vcy5,c='black',zorder=5)
-    plt.plot(vcx6,vcy6,c='black',zorder=5)
-    plt.plot(vcx7,vcy7,c='black',zorder=5)
-    plt.plot(vcx8,vcy8,c='black',zorder=5)
-
-    plt.scatter(34,93,c='black',zorder=5)
-    plt.scatter(34,11,c='black',zorder=5)
-    plt.scatter(34,52,c='black',zorder=5)
-
-    circle1 = plt.Circle((34, 93.5), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
-    circle2 = plt.Circle((34, 10.5), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
-    ax2.add_artist(circle1)
-    ax2.add_artist(circle2)
-    ax2.add_artist(circle3)
-    rec1 = plt.Rectangle((20, 87.5), 30,16,ls='-',color='white', zorder=1,alpha=1)
-    rec2 = plt.Rectangle((0,0),68,104,color='grey',zorder=2,alpha=0.2)  
-    rec3 = plt.Rectangle((20, 0), 30,16.5,ls='-',color='white', zorder=1,alpha=1)
-
-    ax2.add_artist(rec1)
-    ax2.add_artist(rec2)
-    ax2.add_artist(rec3)
 
 
     xgp = p_passg['x']/120 * 104
@@ -730,50 +659,233 @@ def player_pass(df,player_name):
     yhp = 68 - yhp
     end_yhp = 68 - end_yhp
 
+    if (orientation == 'vert')|(orientation == 'vertical'):
+        fig,ax2 = plt.subplots(figsize=(9.8,12.4))
+        #ax2 = plt.axes([0, 0, 1.5, 0.5])
+        #fig.figsize(6.8,10.4)
+        ax2.axis('off')
+
+                    ### TOP ###
+        vcx1 = [0,0,68,68,0]            # sidelines
+        vcy1 = [0,104,104,0,0]
+
+        vcx2 = [13.84,13.84,54.16,54.16] # outer box
+        vcy2 = [104,87.5,87.5,104]
+
+        vcx3 = [30.34,30.34,37.66,37.66] # goal
+        vcy3 = [104,104.2,104.2,104]
+
+        vcx4 = [24.84,24.84,43.16,43.16] # 6-y box
+        vcy4 = [104,99.5,99.5,104]
+
+        vcx5 = [0,68] # Half-way-line
+        vcy5 = [52,52]
 
 
-    #x_size = np.array(nshots.sb_xg.values)
+                    ### BOTTOM ###
 
-    plt.ylim(-1,105)
-    plt.xlim(-1,69)
+        vcx6 = [13.84,13.84,54.16,54.16] # outer box
+        vcy6 = [0,16.5,16.5,0]
 
-    i = 0
+        vcx7 = [30.34,30.34,37.66,37.66] # goal
+        vcy7 = [0,-0.2,-0.2,0]
 
-    for i in range(0,len(p_passg)):
-        plt.plot([ygp[i],end_ygp[i]],
-                [xgp[i],end_xgp[i]],c='red',alpha=0.7,zorder=500)
-    i = 0
-    for i in range(0,len(p_passl)):
-        plt.plot([ylp[i],end_ylp[i]],
-                [xlp[i],end_xlp[i]],c='blue',alpha=0.7,zorder=500)
-    i = 0
-    for i in range(0,len(p_passh)):
-        plt.plot([yhp[i],end_yhp[i]],
-                [xhp[i],end_xhp[i]],c='green',alpha=0.7,zorder=500)
+        vcx8 = [24.84,24.84,43.16,43.16] # 6-y box
+        vcy8 = [0,4.5,4.5,0]
+
+
+        #CENTRE CIRCLE
+
+        circle3 = plt.Circle((34, 52), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
+
+
+        ###### BOX #######
+        plt.plot(vcx1,vcy1,c='black',zorder=5)
+        plt.plot(vcx2,vcy2,c='black',zorder=5)
+        plt.plot(vcx3,vcy3,c='black',zorder=5)
+        plt.plot(vcx4,vcy4,c='black',zorder=5)
+        plt.plot(vcx5,vcy5,c='black',zorder=5)
+        plt.plot(vcx6,vcy6,c='black',zorder=5)
+        plt.plot(vcx7,vcy7,c='black',zorder=5)
+        plt.plot(vcx8,vcy8,c='black',zorder=5)
+
+        plt.scatter(34,93,c='black',zorder=5)
+        plt.scatter(34,11,c='black',zorder=5)
+        plt.scatter(34,52,c='black',zorder=5)
+
+        circle1 = plt.Circle((34, 93.5), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
+        circle2 = plt.Circle((34, 10.5), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
+        ax2.add_artist(circle1)
+        ax2.add_artist(circle2)
+        ax2.add_artist(circle3)
+        rec1 = plt.Rectangle((20, 87.5), 30,16,ls='-',color='white', zorder=1,alpha=1)
+        rec2 = plt.Rectangle((0,0),68,104,color='grey',zorder=2,alpha=0.2)  
+        rec3 = plt.Rectangle((20, 0), 30,16.5,ls='-',color='white', zorder=1,alpha=1)
+
+        ax2.add_artist(rec1)
+        ax2.add_artist(rec2)
+        ax2.add_artist(rec3)
+        
+        plt.ylim(-6,105)
+        plt.xlim(-1,69)
+
+        plt.plot([-100,-100],
+                 [-100,-100],c='red',alpha=0.7,zorder=500,label='Ground Pass')
+        plt.plot([-100,-100],
+                 [-100,-100],c='blue',alpha=0.7,zorder=500,label='Low Pass')
+        plt.plot([-100,-100],
+                 [-100,-100],c='green',alpha=0.7,zorder=500,label='High Pass')
+        ax2.legend(bbox_to_anchor=(0.9, 0.001),ncol=3,fontsize=12)
+
+        i = 0
+
+        for i in range(0,len(p_passg)):
+            plt.plot([ygp[i],end_ygp[i]],
+                    [xgp[i],end_xgp[i]],c='red',alpha=0.7,zorder=500)
+        i = 0
+        for i in range(0,len(p_passl)):
+            plt.plot([ylp[i],end_ylp[i]],
+                    [xlp[i],end_xlp[i]],c='blue',alpha=0.7,zorder=500)
+
+
+        i = 0
+        for i in range(0,len(p_passh)):
+            plt.plot([yhp[i],end_yhp[i]],
+                    [xhp[i],end_xhp[i]],c='green',alpha=0.7,zorder=500)
+
+
+        plt.scatter(y,x,color='white',edgecolors='black',linewidths=1.25,zorder=501,s=110)
+        img = plt.imread("statsbomb-logo.jpg")
+        ax2.imshow(img, extent=[50,68,-6.0275,-0.275],zorder=10000)
+    
+
+    else:
+        
+        fig,ax2 = plt.subplots(figsize=(12.4,9.8))
+        #ax2 = plt.axes([0, 0, 1.5, 0.5])
+        #fig.figsize(6.8,10.4)
+        ax2.axis('off')
+
+        y = 68 - y
+
+        ygp = 68 - ygp
+        end_ygp = 68 - end_ygp
+
+        ylp = 68 - ylp
+        end_ylp = 68 - end_ylp
+
+        yhp = 68 - yhp
+        end_yhp = 68 - end_yhp
+
+
+                    ### TOP ###
+        vcy1 = [0,0,68,68,0]            # sidelines
+        vcx1 = [0,104,104,0,0]
+
+        vcy2 = [13.84,13.84,54.16,54.16] # outer box
+        vcx2 = [104,87.5,87.5,104]
+
+        vcy3 = [30.34,30.34,37.66,37.66] # goal
+        vcx3 = [104,104.2,104.2,104]
+
+        vcy4 = [24.84,24.84,43.16,43.16] # 6-y box
+        vcx4 = [104,99.5,99.5,104]
+
+        vcy5 = [0,68] # Half-way-line
+        vcx5 = [52,52]
+
+
+                    ### BOTTOM ###
+
+        vcy6 = [13.84,13.84,54.16,54.16] # outer box
+        vcx6 = [0,16.5,16.5,0]
+
+        vcy7 = [30.34,30.34,37.66,37.66] # goal
+        vcx7 = [0,-0.2,-0.2,0]
+
+        vcy8 = [24.84,24.84,43.16,43.16] # 6-y box
+        vcx8 = [0,4.5,4.5,0]
+
+
+        #CENTRE CIRCLE
+
+        circle3 = plt.Circle((52,34), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
+
+
+        ###### BOX #######
+        plt.plot(vcx1,vcy1,c='black',zorder=5)
+        plt.plot(vcx2,vcy2,c='black',zorder=5)
+        plt.plot(vcx3,vcy3,c='black',zorder=5)
+        plt.plot(vcx4,vcy4,c='black',zorder=5)
+        plt.plot(vcx5,vcy5,c='black',zorder=5)
+        plt.plot(vcx6,vcy6,c='black',zorder=5)
+        plt.plot(vcx7,vcy7,c='black',zorder=5)
+        plt.plot(vcx8,vcy8,c='black',zorder=5)
+
+        plt.scatter(93,34,c='black',zorder=5)
+        plt.scatter(11,34,c='black',zorder=5)
+        plt.scatter(52,34,c='black',zorder=5)
+
+        circle1 = plt.Circle((93.5,34), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
+        circle2 = plt.Circle((10.5,34), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
+        ax2.add_artist(circle1)
+        ax2.add_artist(circle2)
+        ax2.add_artist(circle3)
+        rec1 = plt.Rectangle((87.5,20), 16,30,ls='-',color='white', zorder=1,alpha=1)
+        rec2 = plt.Rectangle((0,0),104,68,color='grey',zorder=2,alpha=0.2)  
+        rec3 = plt.Rectangle((0, 20), 16.5,30,ls='-',color='white', zorder=1,alpha=1)
+
+        ax2.add_artist(rec1)
+        ax2.add_artist(rec2)
+        ax2.add_artist(rec3)
+        
+        plt.ylim(-7,69)
+        plt.xlim(-1,105)
+
+        plt.plot([-100,-100],
+                 [-100,-100],c='red',alpha=0.7,zorder=500,label='Ground Pass')
+        plt.plot([-100,-100],
+                 [-100,-100],c='blue',alpha=0.7,zorder=500,label='Low Pass')
+        plt.plot([-100,-100],
+                 [-100,-100],c='green',alpha=0.7,zorder=500,label='High Pass')
+        ax2.legend(bbox_to_anchor=(0.80, 0.001),ncol=3,fontsize=14)
+
+        i = 0
+
+        for i in range(0,len(p_passg)):
+            plt.plot([xgp[i],end_xgp[i]],
+                    [ygp[i],end_ygp[i]],c='red',alpha=0.7,zorder=500)
+        i = 0
+        for i in range(0,len(p_passl)):
+            plt.plot([xlp[i],end_xlp[i]],
+                    [ylp[i],end_ylp[i]],c='blue',alpha=0.7,zorder=500)
+
+
+        i = 0
+        for i in range(0,len(p_passh)):
+            plt.plot([xhp[i],end_xhp[i]],
+                    [yhp[i],end_yhp[i]],c='green',alpha=0.7,zorder=500)
+
+
+        plt.scatter(x,y,color='white',edgecolors='black',linewidths=1.25,zorder=501,s=110)
+        
+        img = plt.imread("statsbomb-logo.jpg")
+        ax2.imshow(img, extent=[85,104,-6.0275,-1.275],zorder=10000)
+    
         
 
-    plt.scatter(y,x,color='white',edgecolors='black',linewidths=1.25,zorder=501,s=110)
-    plt.title(str(p_pass['player'].iloc[0])+" Passes", fontsize=18)
+    plt.title(str(p_pass['player'].iloc[0])+" Passes vs "+str(opposition), fontsize=18)
 
 
     ## PLOT LINES FOR LEGEND ##
 
 
-    plt.plot([-100,-100],
-            [-100,-100],c='red',alpha=0.7,zorder=500,label='Ground Pass')
-    plt.plot([-100,-100],
-            [-100,-100],c='blue',alpha=0.7,zorder=500,label='Low Pass')
-    plt.plot([-100,-100],
-            [-100,-100],c='green',alpha=0.7,zorder=500,label='High Pass')
 
 
 
-    img = plt.imread("statsbomb-logo.jpg")
-    ax2.imshow(img, extent=[50,67,1.0275,5.275],zorder=10000)
-    plt.legend(fontsize=12)
-    plt.savefig(str(p_pass['player'].iloc[0])+"_passes",bbox_inches='tight',dpi=300)
-    print("viz saved as "+str(p_pass['player'].iloc[0])+"_passes")
-
+    
+    plt.savefig(str(p_pass['player'].iloc[0])+" Passes vs "+str(opposition),bbox_inches='tight',dpi=300)
+    print("viz saved as "+str(p_pass['player'].iloc[0])+"_Passes_vs_"+str(opposition))
     plt.show()
 
     
