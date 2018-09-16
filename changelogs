@@ -4,3 +4,6 @@ Find information here on what has been added/changed in this project
                   - added shot outcome to shots dataframe
                   - added outcome to main data frame (Complete/Incomplete etc)
                   - added further notes and function guide to sb_help()
+                  
+16.09.2018 11:36  - fixed legend on player pass maps - anchored & centred below viz
+                  - added orientation to player pass maps - vertical or horizontal
