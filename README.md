@@ -10,7 +10,7 @@ after install, run with <b> from sb_handler import * </b>
 - pull goal keeper data from json
 - write code for pass maps
 - write code for player level data (shots,tackles,interceptions etc..)
-- create player location shot maps (using SB's freeze frame, plot where players, GK etc.. are when shot is taken)
+- ~~create player location shot maps (using SB's freeze frame, plot where players, GK etc.. are when shot is taken)~~
 - add expanded event information to dataframe
 
 
