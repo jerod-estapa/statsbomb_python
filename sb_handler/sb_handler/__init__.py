@@ -32,6 +32,7 @@ def clean_sb(data):
     tm = []
     ptm = []
     h = []
+    bp = []
 
     pat = []
 
@@ -96,12 +97,6 @@ def clean_sb(data):
             end_y.append(None)
 
 
-        if ("pass" in data[i]):
-            if("end_loca" in data[i]['pass']):
-                out.append(data[i]['pass']['outcome']['name'])
-            else:
-                out.append(None)
-
         if ("play_pattern" in data[i]):
             pat.append(data[i]['play_pattern']['name'])
         else:
@@ -118,13 +113,8 @@ def clean_sb(data):
         if ("pass" in data[i]):
             if("outcome" in data[i]['pass']):
                 out.append(data[i]['pass']['outcome']['name'])
-            else:
-                out.append(None)
-        elif("shot" in data[i]):
-            if("outcome" in data[i]['shot']):
-                out.append(data[i]['shot']['outcome']['name'])
-            else:
-                out.append(None)
+            elif("outcome" not in data[i]['pass']):
+                out.append("Complete")
         else:
             out.append(None)
 
@@ -163,16 +153,7 @@ def clean_sb(data):
     match_events['end_x'] = end_x 
     match_events['end_y'] = end_y
     match_events['height'] = h
-    #match_events['outcome'] = out
-
-    #i = 0
-    #nout = []
-    #for i in range(0,len(match_events)):
-    #    if (match_events.player.iloc[i] == None)
-    #        nout.append(None)
-    #    elif (match_events.type.iloc[i] == 'Pass')&(match_events.player.iloc[i] == match_events.recipient.iloc[i-1]):
-    #        nout.append('Complete')
-
+    match_events['outcome'] = out
     match_events['recipient'] = rec
 
 
@@ -336,7 +317,7 @@ def get_shots(data):
     y = []
     end_x = []
     end_y = []
-    out = []
+    ous = []
     rec = []
     tm = []
     ptm = []
@@ -401,12 +382,14 @@ def get_shots(data):
             end_y.append(None)
 
 
-        if ("pass" in shot_data[i]):
-            if("end_loca" in shot_data[i]['pass']):
-                out.append(shot_data[i]['pass']['outcome']['name'])
-            else:
-                out.append(None)
-
+        
+       
+         
+        if ("shot" in shot_data[i]):
+            ous.append(shot_data[i]['shot']['outcome']['name'])
+        else:
+            pass
+        
         if ("play_pattern" in shot_data[i]):
             pat.append(shot_data[i]['play_pattern']['name'])
         else:
@@ -419,19 +402,6 @@ def get_shots(data):
                 rec.append(None)  
         else:
             rec.append(None)
-
-        if ("pass" in shot_data[i]):
-            if("outcome" in shot_data[i]['pass']):
-                out.append(shot_data[i]['pass']['outcome']['name'])
-            else:
-                out.append(None)
-        elif("shot" in shot_data[i]):
-            if("outcome" in shot_data[i]['shot']):
-                out.append(shot_data[i]['shot']['outcome']['name'])
-            else:
-                out.append(None)
-        else:
-            out.append(None)
 
         if ("team" in shot_data[i]):
             tm.append(shot_data[i]['team']['name'])
@@ -463,16 +433,7 @@ def get_shots(data):
     shots['y'] = y
     shots['end_x'] = end_x 
     shots['end_y'] = end_y
-    shots['outcome'] = out
-
-    #i = 0
-    #nout = []
-    #for i in range(0,len(shots)):
-    #    if (shots.player.iloc[i] == None)
-    #        nout.append(None)
-    #    elif (shots.type.iloc[i] == 'Pass')&(shots.player.iloc[i] == shots.recipient.iloc[i-1]):
-    #        nout.append('Complete')
-
+    shots['outcome'] = ous
     shots['recipient'] = rec
 
 
@@ -579,33 +540,54 @@ def shot_map(data, team):
     ax2.add_artist(rec3)
 
     nshots = shots[shots['team'] == team]
-
-
+    nshots_h = nshots[nshots['body_part'] == 'Head']
+    nshots_f = nshots[(nshots['body_part'] == 'Left Foot')|(nshots['body_part'] == 'Right Foot')]
 
     x = nshots['x']/120 * 104
     y = nshots['y']/80 * 68
     y = 68 - y
 
+    xh = nshots_h['x']/120 * 104
+    yh = nshots_h['y']/80 * 68
+    yh = 68 - yh
+
+    xf = nshots_f['x']/120 * 104
+    yf = nshots_f['y']/80 * 68
+    yf = 68 - yf
+
     x_size = np.array(nshots.sb_xg.values)
+    xf_size = np.array(nshots_f.sb_xg.values)
+    xh_size = np.array(nshots_h.sb_xg.values)
 
     plt.ylim(52,105)
     plt.xlim(0,68)
-    
+
+    ax2.scatter(-100,-100,marker='o',c='grey',edgecolors='black',s=200,label='Head',alpha=0.6)
+    ax2.scatter(-100,-100,marker='H',c='grey',edgecolors='black',s=200,label='Foot',alpha=0.6)
+    ax2.legend(bbox_to_anchor=(0.70, 0.001),ncol=3,fontsize=14)
+
+
+
     if max(x_size) > 0.50:
         vmx = max(x_size)
     else:
         vmx = 0.50
-    
-    plt.scatter(y,x,cmap='RdBu_r',c=x_size,edgecolors='black',alpha=0.9,marker='H',linewidths=1.25,zorder=5000,s=x_size*1000,vmin=0.00,vmax=vmx)
+
+    plt.scatter(y,x,cmap='RdBu_r',c=x_size,edgecolors='black',alpha=0.9,marker='H',linewidths=1.25,zorder=5000,s=0,vmin=0.00,vmax=vmx)
     plt.colorbar(ax=ax2)
 
-    plt.title(str(team)+"Shots vs "+str(opposition), fontsize=18)
-    
+
+    plt.scatter(yf,xf,cmap='RdBu_r',c=xf_size,edgecolors='black',alpha=0.9,marker='H',linewidths=1.25,zorder=5000,s=xf_size*1000,vmin=0.00,vmax=vmx)
+
+    plt.scatter(yh,xh,cmap='RdBu_r',c=xh_size,edgecolors='black',alpha=0.9,marker='o',linewidths=1.25,zorder=5000,s=xh_size*1000,vmin=0.00,vmax=vmx)
+
+    plt.title(str(team)+" vs "+str(opposition), fontsize=18)
+
     img = plt.imread("statsbomb-logo.jpg")
     ax2.imshow(img, extent=[50,67,53.0275,58.275],zorder=10000)
 
 
-    
+        
 
     plt.savefig("shot_map_"+str(team)+"_vs_"+str(opposition),bbox_inches='tight',dpi=300)
     print("this viz is saved as 'shot_map_"+str(team)+"_vs_"+str(opposition)+".png'")
