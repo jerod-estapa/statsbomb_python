@@ -60,4 +60,4 @@ get_individual_shot(data,number)
 
 ## NOTES ##
 
-I'm not sure what each unit in SB's x and y coordinates refers to, and I prefer working in metres, so all xy values are converted to plot on a 104 x 68 metre pitch
+I'm not sure what each unit in SB's x and y coordinates refers to, and I prefer working in metres, so in plots, all xy values are converted to plot on a 104 x 68 metre pitch
