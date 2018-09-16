@@ -36,4 +36,4 @@ player_pass(df,player_name,orientation) # plots passes made by player - names ca
 
 ## NOTES ##
 
-I'm not sure what each unit in SB's x and y coordinates refers to, and I prefer working in metres, so all viz are adjusted to plot on a 104 x 68 metre pitch
+I'm not sure what each unit in SB's x and y coordinates refers to, and I prefer working in metres, so all xy values are converted to plot on a 104 x 68 metre pitch
