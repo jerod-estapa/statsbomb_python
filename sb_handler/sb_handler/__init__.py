@@ -1,7 +1,7 @@
 
 print("Get help at any time by running sb_help()")
 def sb_help():
-    print("Version 0.1\n\nFUNCTIONS:\ndata = open_sb(<FILENAME>)\ndf = clean_sb(data)\nStartingXI = Lineups(data)\nplayers_played(data) shows players who entered pitch\nshots = get_shots(data) returns a dataframe of shots in match\nshot_map(data,'TEAM') produces viz of team shots. Enter Team name\nplayer_pass(df,'PLAYER','ORIENTATION') produces viz of player passes. Enter player name. Orientation either 'vertical' or 'horizontal\n")
+    print("Version 0.1\n\nFUNCTIONS:\ndata = open_sb(<FILENAME>)\ndf = clean_sb(data)\nStartingXI = Lineups(data)\nplayers_played(data) shows players who entered pitch\nshots = get_shots(data) returns a dataframe of shots in match\nshot_map(data,'TEAM') produces viz of team shots. Enter Team name\nplayer_pass(df,'PLAYER','ORIENTATION') produces viz of player passes.\nEnter player name. Orientation either 'vertical' or 'horizontal\nget_individual_shot(data,NUMBER) produces freeze frame viz. Number refers to shot number -> 1 = First shot\n")
     print("\n\n for further queries contact Peter McKeever on Twitter @petermckeever")
 def open_sb(file):
         file = file
@@ -605,9 +605,11 @@ def player_pass(df,player_name,orientation):
     import matplotlib as mpl
 
     orientation = orientation
-    p_pass = df[(df['player'] == player_name)&(df['type'] == 'Pass')]
+    p_pass = df[(df['player'] == player_name)&(df['type'] == 'Pass')&(df['outcome']== 'Complete')]
+    ip_pass = df[(df['player'] == player_name)&(df['type'] == 'Pass')&(df['outcome']== 'Inomplete')]
     team = p_pass.team.iloc[0]
     p_pass = p_pass[['player','x','y','end_x','end_y','height']]
+
 
     p_passg = p_pass[p_pass['height'] == 'Ground Pass']
     p_passg.reset_index(inplace=True)
@@ -615,6 +617,13 @@ def player_pass(df,player_name,orientation):
     p_passl.reset_index(inplace=True)
     p_passh = p_pass[p_pass['height'] == 'High Pass']
     p_passh.reset_index(inplace=True)
+
+    ip_passg = ip_pass[ip_pass['height'] == 'Ground Pass']
+    ip_passg.reset_index(inplace=True)
+    ip_passl = ip_pass[ip_pass['height'] == 'Low Pass']
+    ip_passl.reset_index(inplace=True)
+    ip_passh = ip_pass[ip_pass['height'] == 'High Pass']
+    ip_passh.reset_index(inplace=True)
 
 
     #inc_p_pass = p_pass[p_pass['outcome'] == 'Incomplete']
@@ -627,7 +636,7 @@ def player_pass(df,player_name,orientation):
         opposition = teams[0]
 
 
-
+    ### Complete Passes ###
     xgp = p_passg['x']/120 * 104
     ygp = p_passg['y']/80 * 68
     end_xgp = p_passg['end_x']/120 * 104
@@ -659,8 +668,42 @@ def player_pass(df,player_name,orientation):
     yhp = 68 - yhp
     end_yhp = 68 - end_yhp
 
+
+    ### Incomplete Passes ###
+
+    ixgp = ip_passg['x']/120 * 104
+    iygp = ip_passg['y']/80 * 68
+    end_ixgp = ip_passg['end_x']/120 * 104
+    end_iygp = ip_passg['end_y']/80 * 68
+
+    ixlp = ip_passl['x']/120 * 104
+    iylp = ip_passl['y']/80 * 68
+    end_ixlp = ip_passl['end_x']/120 * 104
+    end_iylp = ip_passl['end_y']/80 * 68
+
+    ixhp = ip_passh['x']/120 * 104
+    iyhp = ip_passh['y']/80 * 68
+    end_ixhp = ip_passh['end_x']/120 * 104
+    end_iyhp = ip_passh['end_y']/80 * 68
+
+
+
+    ix = ip_pass.x/120 * 104
+    iy = ip_pass.y/80 * 68
+
+    iy = 68 - iy
+
+    iygp = 68 - iygp
+    end_iygp = 68 - end_iygp
+
+    iylp = 68 - iylp
+    end_iylp = 68 - end_iylp
+
+    iyhp = 68 - iyhp
+    end_iyhp = 68 - end_iyhp
+
     if (orientation == 'vert')|(orientation == 'vertical'):
-        fig,ax2 = plt.subplots(figsize=(9.8,12.4))
+        fig,ax2 = plt.subplots(figsize=(10.8,12.4))
         #ax2 = plt.axes([0, 0, 1.5, 0.5])
         #fig.figsize(6.8,10.4)
         ax2.axis('off')
@@ -738,7 +781,7 @@ def player_pass(df,player_name,orientation):
         ax2.legend(bbox_to_anchor=(0.9, 0.001),ncol=3,fontsize=12)
 
         i = 0
-
+        # Complete Passes #
         for i in range(0,len(p_passg)):
             plt.plot([ygp[i],end_ygp[i]],
                     [xgp[i],end_xgp[i]],c='red',alpha=0.7,zorder=500)
@@ -746,12 +789,26 @@ def player_pass(df,player_name,orientation):
         for i in range(0,len(p_passl)):
             plt.plot([ylp[i],end_ylp[i]],
                     [xlp[i],end_xlp[i]],c='blue',alpha=0.7,zorder=500)
-
-
         i = 0
         for i in range(0,len(p_passh)):
             plt.plot([yhp[i],end_yhp[i]],
                     [xhp[i],end_xhp[i]],c='green',alpha=0.7,zorder=500)
+
+        # Incomplete Passes #
+
+        for i in range(0,len(ip_passg)):
+            plt.plot([iygp[i],end_iygp[i]],
+                    [ixgp[i],end_ixgp[i]],c='red',alpha=0.2,zorder=500)
+        i = 0
+        for i in range(0,len(ip_passl)):
+            plt.plot(i[ylp[i],end_iylp[i]],
+                    [ixlp[i],end_ixlp[i]],c='blue',alpha=0.2,zorder=500)
+
+
+        i = 0
+        for i in range(0,len(ip_passh)):
+            plt.plot([iyhp[i],end_iyhp[i]],
+                    [ixhp[i],end_ixhp[i]],c='green',alpha=0.2,zorder=500)
 
 
         plt.scatter(y,x,color='white',edgecolors='black',linewidths=1.25,zorder=501,s=110)
@@ -766,6 +823,7 @@ def player_pass(df,player_name,orientation):
         #fig.figsize(6.8,10.4)
         ax2.axis('off')
 
+        # Complete Passes #
         y = 68 - y
 
         ygp = 68 - ygp
@@ -776,6 +834,19 @@ def player_pass(df,player_name,orientation):
 
         yhp = 68 - yhp
         end_yhp = 68 - end_yhp
+
+        # Incomplete Passes #
+
+        iy = 68 - iy
+
+        iygp = 68 - iygp
+        end_iygp = 68 - end_iygp
+
+        iylp = 68 - iylp
+        end_iylp = 68 - end_iylp
+
+        iyhp = 68 - iyhp
+        end_iyhp = 68 - end_iyhp
 
 
                     ### TOP ###
@@ -851,7 +922,7 @@ def player_pass(df,player_name,orientation):
         ax2.legend(bbox_to_anchor=(0.80, 0.001),ncol=3,fontsize=14)
 
         i = 0
-
+        # Complete Passes #
         for i in range(0,len(p_passg)):
             plt.plot([xgp[i],end_xgp[i]],
                     [ygp[i],end_ygp[i]],c='red',alpha=0.7,zorder=500)
@@ -859,12 +930,24 @@ def player_pass(df,player_name,orientation):
         for i in range(0,len(p_passl)):
             plt.plot([xlp[i],end_xlp[i]],
                     [ylp[i],end_ylp[i]],c='blue',alpha=0.7,zorder=500)
-
-
         i = 0
         for i in range(0,len(p_passh)):
             plt.plot([xhp[i],end_xhp[i]],
                     [yhp[i],end_yhp[i]],c='green',alpha=0.7,zorder=500)
+
+        # Incomplete Passes
+        for i in range(0,len(ip_passg)):
+            plt.plot([ixgp[i],end_ixgp[i]],
+                    [iygp[i],end_iygp[i]],c='red',alpha=0.2,zorder=500)
+        i = 0
+        for i in range(0,len(ip_passl)):
+            plt.plot([ixlp[i],end_ixlp[i]],
+                    [iylp[i],end_iylp[i]],c='blue',alpha=0.2,zorder=500)
+        i = 0
+        for i in range(0,len(ip_passh)):
+            plt.plot([ixhp[i],end_ixhp[i]],
+                    [iyhp[i],end_iyhp[i]],c='green',alpha=0.2,zorder=500)
+
 
 
         plt.scatter(x,y,color='white',edgecolors='black',linewidths=1.25,zorder=501,s=110)
@@ -884,8 +967,237 @@ def player_pass(df,player_name,orientation):
 
 
     
-    plt.savefig(str(p_pass['player'].iloc[0])+" Passes vs "+str(opposition),bbox_inches='tight',dpi=300)
-    print("viz saved as "+str(p_pass['player'].iloc[0])+"_Passes_vs_"+str(opposition))
+    plt.savefig(str(p_pass['player'].iloc[0])+" Passes vs "+str(opposition)+"_"+str(orientation),bbox_inches='tight',dpi=300)
+    print("viz saved as "+str(p_pass['player'].iloc[0])+"_Passes_vs_"+str(opposition)+"_"+str(orientation))
+    plt.show()
+
+
+def get_individual_shot(data,shot_number):
+    import pandas as pd
+    import numpy as np
+    import seaborn as sns; sns.set()
+    from tqdm import tqdm
+    import matplotlib.pyplot as plt
+    import pylab
+    from matplotlib.collections import LineCollection
+    import matplotlib as mpl
+
+    freeze_frame_data = []
+
+    i = 0
+    shots = get_shots(data)
+    for i in range(0,len(shots)):
+        ffd = shots.m_index.iloc[i]
+        freeze_frame_data.append(data[ffd-1])
+
+    freeze_frame_data
+    print("There were "+str(len(freeze_frame_data))+" shots in this match")
+
+
+
+
+
+    i = shot_number
+    freeze_frame_data[i]
+
+    ind_shot_x = freeze_frame_data[i]['location'][0]
+    ind_shot_y = freeze_frame_data[i]['location'][1]
+    ind_shot_minute = freeze_frame_data[i]['minute']
+    ind_shot_second = freeze_frame_data[i]['second']
+    ind_shot_play_pattern = freeze_frame_data[i]['play_pattern']['name']
+    ind_shot_shot_taker = freeze_frame_data[i]['player']['name']
+    ind_shot_body_part = freeze_frame_data[i]['shot']['body_part']['name']
+    ind_shot_end_x = freeze_frame_data[i]['shot']['end_location'][0]
+    ind_shot_end_y = freeze_frame_data[i]['shot']['end_location'][1]
+    ind_shot_type = freeze_frame_data[i]['type']['name']
+    ind_shot_team = freeze_frame_data[i]['team']['name']
+    ind_shot_outcome = freeze_frame_data[i]['shot']['outcome']['name']
+    ind_shot_freeze = freeze_frame_data[i]['shot']['freeze_frame']
+    ind_shot_taker_pos = freeze_frame_data[i]['position']['name']
+
+    ind_shot = pd.DataFrame([ind_shot_x,ind_shot_y,ind_shot_minute,ind_shot_second,ind_shot_play_pattern,ind_shot_shot_taker,ind_shot_taker_pos,ind_shot_body_part,
+                             ind_shot_end_x,ind_shot_end_y,ind_shot_type,ind_shot_team,ind_shot_outcome,ind_shot_freeze]).T
+    ind_shot
+
+    fig,ax2 = plt.subplots(figsize=(12.4,6.8))
+    #ax2 = plt.axes([0, 0, 1.5, 0.5])
+    #fig.figsize(6.8,10.4)
+    ax2.axis('off')
+
+
+
+
+                ### TOP ###
+    vcx1 = [0,0,68,68,0]            # sidelines
+    vcy1 = [0,104,104,0,0]
+
+    vcx2 = [13.84,13.84,54.16,54.16] # outer box
+    vcy2 = [104,87.5,87.5,104]
+
+    vcx3 = [30.34,30.34,37.66,37.66] # goal
+    vcy3 = [104,104.2,104.2,104]
+
+    vcx4 = [24.84,24.84,43.16,43.16] # 6-y box
+    vcy4 = [104,99.5,99.5,104]
+
+    vcx5 = [0,68] # Half-way-line
+    vcy5 = [52,52]
+
+
+                ### BOTTOM ###
+
+    vcx6 = [13.84,13.84,54.16,54.16] # outer box
+    vcy6 = [0,16.5,16.5,0]
+
+    vcx7 = [30.34,30.34,37.66,37.66] # goal
+    vcy7 = [0,-0.2,-0.2,0]
+
+    vcx8 = [24.84,24.84,43.16,43.16] # 6-y box
+    vcy8 = [0,4.5,4.5,0]
+
+
+    #CENTRE CIRCLE
+
+    circle3 = plt.Circle((34, 52), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
+
+
+    ###### BOX #######
+    plt.plot(vcx1,vcy1,c='black',zorder=5)
+    plt.plot(vcx2,vcy2,c='black',zorder=5)
+    plt.plot(vcx3,vcy3,c='black',zorder=5)
+    plt.plot(vcx4,vcy4,c='black',zorder=5)
+    plt.plot(vcx5,vcy5,c='black',zorder=5)
+    plt.plot(vcx6,vcy6,c='black',zorder=5)
+    plt.plot(vcx7,vcy7,c='black',zorder=5)
+    plt.plot(vcx8,vcy8,c='black',zorder=5)
+
+    plt.scatter(34,93,c='black',zorder=5)
+    plt.scatter(34,11,c='black',zorder=5)
+    plt.scatter(34,52,c='black',zorder=5)
+
+    circle1 = plt.Circle((34, 93.5), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
+    circle2 = plt.Circle((34, 10.5), 9.15,ls='solid',lw=1.5,color='black', fill=False, zorder=1,alpha=1)
+    ax2.add_artist(circle1)
+    ax2.add_artist(circle2)
+    ax2.add_artist(circle3)
+    rec1 = plt.Rectangle((20, 87.5), 30,16,ls='-',color='white', zorder=1,alpha=1)
+    rec2 = plt.Rectangle((0,0),68,104,color='grey',zorder=2,alpha=0.2)  
+    rec3 = plt.Rectangle((20, 0), 30,16.5,ls='-',color='white', zorder=1,alpha=1)
+
+    ax2.add_artist(rec1)
+    ax2.add_artist(rec2)
+    ax2.add_artist(rec3)
+
+    plt.xlim(-1,69)
+    plt.ylim(51.5,105)
+
+    get_player_locs_x = []
+    get_player_locs_y = []
+    get_player_name = []
+    get_player_pos = []
+
+    fget_player_locs_x = []
+    fget_player_locs_y = []
+    fget_player_name = []
+    fget_player_pos = []
+    i = 0
+    for i in range(0,len(ind_shot_freeze)):
+        if (ind_shot_freeze[i]['teammate'] == False):
+            gx = ind_shot_freeze[i]['location'][0] /120 * 104
+            gy = 68 - (ind_shot_freeze[i]['location'][1] / 80 * 68)
+            gname = ind_shot_freeze[i]['player']['name']
+            gpos = ind_shot_freeze[i]['position']['name']
+            get_player_locs_x.append(gx)
+            get_player_locs_y.append(gy)
+            get_player_name.append(gname)
+            get_player_pos.append(gpos)
+
+        elif (ind_shot_freeze[i]['teammate'] == True):
+            gxf = ind_shot_freeze[i]['location'][0] /120 * 104
+            gyf = 68 - (ind_shot_freeze[i]['location'][1] / 80 * 68)
+            gnamef = ind_shot_freeze[i]['player']['name']
+            gposf = ind_shot_freeze[i]['position']['name']
+            fget_player_locs_x.append(gxf)
+            fget_player_locs_y.append(gyf)
+            fget_player_name.append(gnamef)
+            fget_player_pos.append(gposf)
+
+
+
+    get_player_pos = [g.replace('Midfield', 'M') for g in get_player_pos ]
+    get_player_pos = [g.replace('Centre', 'C') for g in get_player_pos ]
+    get_player_pos = [g.replace('Full', 'F') for g in get_player_pos ]
+    get_player_pos = [g.replace('Back', 'B') for g in get_player_pos ]
+    get_player_pos = [g.replace('Center', 'C') for g in get_player_pos ]
+    get_player_pos = [g.replace('Left', 'L') for g in get_player_pos ]
+    get_player_pos = [g.replace('Right', 'R') for g in get_player_pos ]
+    get_player_pos = [g.replace('Goalkeeper', 'GK') for g in get_player_pos ]
+    get_player_pos = [g.replace('Secondary Striker', 'SS') for g in get_player_pos ]
+    get_player_pos = [g.replace('Wing', 'W') for g in get_player_pos ]
+    get_player_pos = [g.replace('Attacking', 'A') for g in get_player_pos ]
+    get_player_pos = [g.replace('Forward', 'F') for g in get_player_pos ]
+    get_player_pos = [g.replace(' ', '') for g in get_player_pos ]
+    get_player_pos = [g.replace('Defensive', 'D') for g in get_player_pos ]
+
+
+    fget_player_pos = [g.replace('Midfield', 'M') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Centre', 'C') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Full', 'F') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Back', 'B') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Center', 'C') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Left', 'L') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Right', 'R') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Goalkeeper', 'GK') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Secondary Striker', 'SS') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Wing', 'W') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Attacking', 'A') for g in fget_player_pos ]
+    fget_player_pos = [g.replace(' ', '') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Forward', 'F') for g in fget_player_pos ]
+    fget_player_pos = [g.replace('Defensive', 'D') for g in fget_player_pos ]
+    #ind_shot_taker_pos = [g.replace(' ', '') for g in fget_player_pos ]
+
+    gx = get_player_locs_x
+    gy = get_player_locs_y
+
+    gxf = fget_player_locs_x
+    gyf = fget_player_locs_y
+
+    i = 0
+    for i, txt in enumerate(get_player_pos):
+        ax2.annotate(txt, (gy[i],gx[i]),color='white',ha='center',va='center',fontsize=6.5,zorder=650)
+
+    i = 0
+    for i, txt in enumerate(fget_player_pos):
+        ax2.annotate(txt, (gyf[i],gxf[i]),color='white',ha='center',va='center',fontsize=6.5,zorder=650)
+
+
+    #gy = 68 - gy
+
+    sx = ind_shot_x/120 * 104
+    sy = ind_shot_y/80 * 68
+    sxe = ind_shot_end_x/120 *104
+    sye = ind_shot_end_y/80 * 68
+
+    plt.scatter(-100,-100,marker='o',s=220,edgecolors='black',linewidths=1.25,color='red',alpha=0.6,zorder=600,label='Opposition')
+    plt.scatter(-100,-100,marker='o',s=220,edgecolors='black',linewidths=1.25,color='green',alpha=0.6,zorder=600,label='Teammate')
+    plt.scatter(sy,sx,marker='H',s=200,edgecolors='black',linewidths=1.25,color='blue',alpha=1,zorder=600,label=ind_shot_shot_taker)
+    plt.legend(loc=3,fontsize=12)
+
+
+    plt.scatter(gy,gx,marker='o',s=220,edgecolors='black',linewidths=1.25,color='red',alpha=1,zorder=600)
+    plt.scatter(gyf,gxf,marker='o',s=220,edgecolors='black',linewidths=1.25,color='green',alpha=1,zorder=600)
+
+    plt.plot([sy,sye],
+             [sx,sxe],c='grey',zorder=550)
+
+    plt.title(str(ind_shot_shot_taker)+" shot with "+str(ind_shot_body_part)+" at "+str(ind_shot_minute)+":"+str(ind_shot_second)+"\nOutcome - "+str(ind_shot_outcome),fontsize=18)
+
+    img = plt.imread("statsbomb-logo.jpg")
+    ax2.imshow(img, extent=[50,67.5,53.0275,58.275],zorder=10000)
+
+
+    plt.savefig(str(ind_shot_shot_taker)+" shot with "+str(ind_shot_body_part)+" at "+str(ind_shot_minute)+"_"+str(ind_shot_second)+"_Outcome_"+str(ind_shot_outcome),bbox_inches='tight',dpi=300)
+    print("viz saved as "+str(ind_shot_shot_taker)+" shot with "+str(ind_shot_body_part)+" at "+str(ind_shot_minute)+"_"+str(ind_shot_second)+"_Outcome_"+str(ind_shot_outcome))
     plt.show()
 
     
