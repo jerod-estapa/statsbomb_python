@@ -32,4 +32,4 @@ shots = get_shots(data) # returns a dataframe of shots --> to do: add shot outco
 
 shot_map(data,team) # plots a shot map for selected team with size and shade representing xG value --> to do: add further shot information (body part, outcome)
 
-player_pass(df,player_name) # plots passes made by player - names can be found by running df.player.unique() --> to do: seperate successful and unsuccessful passes
+player_pass(df,player_name,orientation) # plots passes made by player - names can be found by running df.player.unique() - orientation set as either 'vertical' or 'horizontal' --> to do: seperate successful and unsuccessful passes
