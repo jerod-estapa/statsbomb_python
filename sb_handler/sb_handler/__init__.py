@@ -1,8 +1,8 @@
 
 print("Get help at any time by running sb_help()")
 def sb_help():
-    print("Version 0.1\n\nFUNCTIONS:\ndata = open_sb(<FILENAME>)\ndf = clean_sb(data)\nStartingXI = Lineups(data)\n")
-
+    print("Version 0.1\n\nFUNCTIONS:\ndata = open_sb(<FILENAME>)\ndf = clean_sb(data)\nStartingXI = Lineups(data)\nplayers_played(data) shows players who entered pitch\nshots = get_shots(data) returns a dataframe of shots in match\nshot_map(data,'TEAM') produces viz of team shots. Enter Team name\nplayer_pass(df,'PLAYER') produces viz of player passes. Enter player name\n")
+    print("\n\n for further queries contact Peter McKeever on Twitter @petermckeever")
 def open_sb(file):
         file = file
         import json
