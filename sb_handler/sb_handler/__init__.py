@@ -1174,9 +1174,9 @@ def get_individual_shot(data,shot_number):
     #gy = 68 - gy
 
     sx = ind_shot_x/120 * 104
-    sy = ind_shot_y/80 * 68
+    sy = 68 - (ind_shot_y/80 * 68)
     sxe = ind_shot_end_x/120 *104
-    sye = ind_shot_end_y/80 * 68
+    sye = 68 - (ind_shot_end_y/80 * 68)
 
     plt.scatter(-100,-100,marker='o',s=220,edgecolors='black',linewidths=1.25,color='red',alpha=0.6,zorder=600,label='Opposition')
     plt.scatter(-100,-100,marker='o',s=220,edgecolors='black',linewidths=1.25,color='green',alpha=0.6,zorder=600,label='Teammate')
