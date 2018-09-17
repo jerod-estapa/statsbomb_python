@@ -56,7 +56,7 @@ get_individual_shot(data,number)
     # Plots individual shot freeze frame with positions of other players. 
     # Number refers to shot number with 1 being first shot 
     # of match, 2 being second etc..)
-    # to do: add GK context, creat Abbreviation dictionary to shorten code
+    # to do: add GK context, creat Abbreviation dictionary to shorten code, adjust code for penalties
 
 ## NOTES ##
 
