@@ -10,5 +10,5 @@ Find information here on what has been added/changed in this project
         
 16.09.2018 14:26  - added freeze frames for individual shots
                   
-                  
+17.09.2018 11:50 - fixed shooting player location inversion in get_individual_goal function                  
          
